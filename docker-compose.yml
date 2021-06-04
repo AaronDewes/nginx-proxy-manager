@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: "10.21.21.5"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "nginx"
+      DB_MYSQL_PASSWORD: "reverseproxygobrrr"
+      DB_MYSQL_NAME: "nginx"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      default:
+        ipv4_address: "10.21.21.6"
+
+  db:
+    image: 'mariadb:10.6'
+    environment:
+      MARIADB_ROOT_PASSWORD: 'reverseproxygobrrr'
+      MARIADB_DATABASE: 'nginx'
+      MARIADB_USER: 'nginx'
+      MARIADB_PASSWORD: 'reverseproxygobrrr'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: "10.21.21.5"
+
+networks:
+    default:
+      name: nginx_main_network
+      ipam:
+          driver: default
+          config:
+              - subnet: "10.21.21.0/24"

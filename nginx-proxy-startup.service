@@ -1,0 +1,31 @@
+# Proxy Startup Service
+# Installed at /etc/systemd/system/nginx-proxy-startup.service
+
+[Unit]
+Description=Nginx Startup Service
+Wants=network-online.target
+After=network-online.target
+Wants=docker.service
+After=docker.service
+
+# This prevents us hitting restart rate limits and ensures we keep restarting
+# indefinitely.
+StartLimitInterval=0
+
+[Service]
+Type=forking
+TimeoutStartSec=infinity
+TimeoutStopSec=16min
+ExecStart=/home/nginx/nginx/start.sh
+ExecStop=/home/nginx/nginx/stop.sh
+User=root
+Group=root
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=nginx startup
+RemainAfterExit=yes
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
